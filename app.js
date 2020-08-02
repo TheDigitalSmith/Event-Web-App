@@ -5,6 +5,7 @@ const mongoose = require("mongoose");
 
 const graphQLSchema = require("./graphql/schemas");
 const graphQLResolvers = require("./graphql/resolvers");
+const isAuth = require("./middleware/is-auth");
 
 const app = express();
 dotenv.config();
@@ -17,6 +18,8 @@ mongoose.connect(
     console.log(err || "MongoDB Connected");
   }
 );
+
+app.use(isAuth);
 
 app.use(
   "/graphql",

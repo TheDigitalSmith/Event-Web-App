@@ -1,5 +1,8 @@
 const User = require("../../models/users");
 const { events } = require("./merge");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
+dotenv.config();
 
 const bcrypt = require("bcryptjs");
 
@@ -31,6 +34,33 @@ module.exports = {
       });
       user.password = null;
       return user;
+    } catch (err) {
+      return err;
+    }
+  },
+  login: async (args) => {
+    try {
+      const user = await User.findOne({ email: args.email });
+
+      if (!user) {
+        throw new Error("Invalid Credentials");
+      }
+
+      const valid = await bcrypt.compare(args.password, user.password);
+      if (!valid) {
+        throw new Error("Invalid Credentials");
+      }
+      const token = jwt.sign(
+        { userId: user._id, email: user.email },
+        process.env.TOKEN,
+        { expiresIn: "1h" }
+      );
+
+      return {
+        userId: user._id,
+        token: token,
+        tokenExpiration: 1,
+      };
     } catch (err) {
       return err;
     }
