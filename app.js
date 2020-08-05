@@ -1,6 +1,7 @@
 const express = require("express");
 const { graphqlHTTP } = require("express-graphql");
 const dotenv = require("dotenv");
+const cors = require("cors");
 const mongoose = require("mongoose");
 
 const graphQLSchema = require("./graphql/schemas");
@@ -10,6 +11,7 @@ const isAuth = require("./middleware/is-auth");
 const app = express();
 dotenv.config();
 app.use(express.json());
+app.use(cors());
 
 mongoose.connect(
   process.env.MONGODB_URI,
@@ -20,7 +22,6 @@ mongoose.connect(
 );
 
 app.use(isAuth);
-
 app.use(
   "/graphql",
   graphqlHTTP({
