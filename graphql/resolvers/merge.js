@@ -18,7 +18,7 @@ const user = async (userId) => {
     const user = await userDataLoader.load(userId.toString());
     const userInfo = {
       ...user._doc,
-      createdEvents: eventDataLoader.load.bind(this, user._doc.createdEvents),
+      createdEvents: () => eventDataLoader.loadMany(user._doc.createdEvents),
     };
     return userInfo;
   } catch (err) {
@@ -28,9 +28,10 @@ const user = async (userId) => {
 
 const singleEvent = async (eventId) => {
   try {
-    const event = await eventDataLoader.load(eventId.toString());
+    const event = await eventDataLoader.load(eventId._id.toString());
     return event;
   } catch (error) {
+    console.log(error);
     throw err;
   }
 };
@@ -51,7 +52,7 @@ const transformEvent = (event) => {
   return {
     ...event._doc,
     date: dateToString(event._doc.date),
-    creator: user.bind(this, event.creator),
+    creator: user.bind(this, event._doc.creator),
   };
 };
 
